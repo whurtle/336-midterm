@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Midterm 1</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    </head>
+        <style>
+            body{
+                margin: auto;
+                text-align: center;
+            }
+            .likeDislike{
+                width: 40px;
+            }
+            span{
+                text-align: center;
+            }
+            #comments{
+                text-align: left;
+                width: 560px;
+                margin: 0 auto;
+            }
+            #qResponse{
+                color: white;
+                width: 560px;
+                margin: 0 auto;
+                text-align: center;
+            }
+            table{
+                text-align: center;
+                margin: 0 auto;
+            }
+        </style>
+    <body>
+        <h1>CST 336 Midterm Exam - Fall 2019</h1><br><br>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/6CICHREhv-Y" frameborder="0"></iframe>
+        <br>
+        <span>
+            <input type="button" id="showComments" value="See Comments">
+            <input type="button" id="answerQuestion" value="Answer Question">
+            <input type="image" class="likeDislike" id="likeBtn" src="img/cancel_like.png">
+            <span id="likes"></span>
+            <input type="image" class="likeDislike" id="dislikeBtn" src="img/cancel_dislike.png">
+            <span id="dislikes"></span>
+            <br>
+            <div id="comments"><br></div>
+            <div id = "questionDiv" style="display:none">
+                <h2>Who performed the song in the video?</h2>
+                <select id="questionDrop">
+                  <option value="">Select One</option>
+                  <option value="boney">Boney James</option>
+                  <option value="bobby">Bobby Caldwell</option>
+                  <option value="lara">Miguel Lara</option>
+                </select>  
+                <br>
+                <h2 id="qResponse"></h2>
+            </div>
+        </span>
+      <br><br><br><br><br>
+      <table border="1" width="600" cellpadding="10px">
+        <tbody><tr><th>#</th><th>Task Description</th><th>Points</th></tr>
+         <tr style="color:green">
+          <td>1</td>
+          <td>All elements are included (video and buttons) <br></td>
+          <td width="20" align="center">10</td>
+         </tr>     
+         <tr style="color:green">
+          <td>2</td>
+          <td>Initial number of likes/dislikes is displayed from API when loading page<br>
+            </td>
+          <td width="20" align="center">10</td>
+        </tr>     
+         <tr style="color:green">
+          <td>3</td>
+          <td>When clicking on any like/dislike button, it's hidden and the other blue/grayedout button is displayed <br></td>
+          <td width="20" align="center">10</td>
+        </tr>     
+         <tr style="color:green">
+          <td>4</td>
+          <td>When clicking on any like/dislike button, the corresponding value is updated via an AJAX call <br></td>
+          <td width="20" align="center">20</td>
+        </tr>     
+         <tr style="color:green">
+          <td>5</td>
+          <td>When clicking on "See Comments", author, date, and comment are displayed via AJAX in the following format: <br> <b>Author</b> <i>Date</i><br>Comment<br></td>
+          <td width="20" align="center">20</td>
+        </tr>     
+         <tr style="color:green">
+          <td>6</td>
+          <td>When clicking on "See Comments, comments are in random order<br></td>
+          <td width="20" align="center">10</td>
+        </tr>
+         <tr style="color:green">
+          <td>7</td>
+          <td>When clicking on "See Comments", stars are displayed based on the RATING value<br></td>
+          <td width="20" align="center">10</td>
+        </tr> 
+      <tr style="color:green">
+          <td>8</td>
+          <td>When clicking on "Answer Question" a dropdown question is displayed <br></td>
+          <td width="20" align="center">5</td>
+        </tr>    
+      <tr style="color:green">
+          <td>9</td>
+          <td>When answering the question, color-coded feedback is displayed <br></td>
+          <td width="20" align="center">15</td>
+        </tr>    
+        <tr style="color:black">
+          <td>10</td>
+          <td>Page has nice design: content is centered, all buttons right below the video <br></td>
+          <td width="20" align="center">10</td>
+        </tr>
+        <tr style="color:green">
+          <td>11</td>
+          <td>This rubric is properly included AND UPDATED</td>
+          <td width="20" align="center">3</td>
+        </tr>
+            
+         <tr>
+          <td></td>
+          <td>T O T A L </td>
+          <td width="20" align="center">&nbsp;</td>
+        </tr> 
+      </tbody></table>
+    </body>
+    
+    <script>
+        /* global $ */
+        let liked = false;
+        let dislike = false;
+        let commentsShow = false;
+        let questionShow = false;
+        $.ajax({
+            method: "get",
+            url: "https://cst336.herokuapp.com/projects/api/videoLikesAPI.php",
+            dataType: "json",
+            data: { "videoId" : "6CICHREhv-Y"},
+            success: function(result,status) {
+                displayLikesDisLikes(result.likes, result.dislikes);
+            } 
+        });
+    
+        function updateLikeDislike(action){
+            $.ajax({
+            method: "GET",
+            url: "https://cst336.herokuapp.com/projects/api/videoLikesAPI.php",
+            dataType: "json",
+            data: { "videoId" : "6CICHREhv-Y",
+                    "action" : `${action}` },
+            success: function(result,status) {
+                displayLikesDisLikes(result.likes, result.dislikes);
+            } 
+        });
+        }
+        
+        function displayLikesDisLikes(likes, dislikes){
+            $("#likes").html(likes);
+            $("#dislikes").html(dislikes);
+        }
+        
+        $("#likeBtn").on("click", function(){
+            if(liked){
+                updateLikeDislike("cancel_like");
+                $("#likeBtn").attr('src','img/cancel_like.png');
+            } else{
+                updateLikeDislike("like");
+                $("#likeBtn").attr('src','img/like.png');
+                if(dislike){
+                    dislike = false;
+                    updateLikeDislike("cancel_dislike");
+                    $("#dislikeBtn").attr('src','img/cancel_dislike.png');
+                }
+            }
+            liked = !liked;
+            
+        });
+        $("#dislikeBtn").on("click", function(){
+            if(dislike){
+                updateLikeDislike("cancel_dislike");
+                $("#dislikeBtn").attr('src','img/cancel_dislike.png');
+            } else{
+                updateLikeDislike("dislike");
+                $("#dislikeBtn").attr('src','img/dislike.png');
+                if(liked){
+                    liked = false;
+                    updateLikeDislike(("cancel_like"));
+                    $("#likeBtn").attr('src','img/cancel_like.png');
+                }
+            }
+            dislike = !dislike;
+        });
+        
+        $("#showComments").on("click", function() {
+            if(questionShow){
+                questionShow = false;
+                $("#questionDiv").hide()
+            }
+            if(!commentsShow){
+                commentsShow = true;
+                $.ajax({
+                method: "get",
+                url: "https://cst336.herokuapp.com/projects/api/videoLikesAPI.php",
+                dataType: "json",
+                data: { "videoId" : "6CICHREhv-Y",
+                        "action"  : "comments" },
+                success: function(result,status) {
+                    shuffleArray(result);
+                    for(let i = 0; i < result.length; i++){
+                        $("#comments").append("<div><strong>" + result[i].author + "</strong> " +
+                                                   "<i>" + result[i].date + "</i><br>"
+                                                      + result[i].comment + "</div><br>"); 
+                        for(let j = 0; j < result[i].rating; j++){
+                            $("#comments").append("<img src='img/star.jpg' width = 25px>");
+                        }
+                        $("#comments").append("<br><br>");
+                    }
+                } 
+                });
+            } else{
+                commentsShow = false;
+                $("#comments").html("<br>");
+            }
+        });
+        $("#answerQuestion").on("click",function() {
+            if(commentsShow){
+                commentsShow = false;
+                $("#comments").html("<br>");
+            }
+           if(!questionShow){
+               questionShow = true;
+               $("#questionDiv").show();
+           } else{
+               questionShow = false;
+               $("#questionDiv").hide();
+           }
+        });
+        $("#questionDrop").on("change", function(){
+            if(this.value == "bobby"){
+                $("#qResponse").html("You're right!");
+                $("#qResponse").css("background", "green");
+            } else if(this.value == "lara"){
+                $("#qResponse").html("Very funny, not quite");
+                $("#qResponse").css("background", "red");
+            } else {
+                $("#qResponse").html("That's not right");
+                $("#qResponse").css("background", "red");
+            }
+        });
+        
+        function shuffleArray(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+    </script>
+</html>
